@@ -55,7 +55,48 @@
       if (!data.user) {
         console.log("Guest Mode: User not logged in");
       }
-    });
+   const suggestionsData = [
+  "Mafia World News",
+  "Mafia Chat",
+  "Mafia Resell Shop",
+  "Mafia Fashion",
+  "Mafia Queen Suits",
+  "Mafia Chat Voice Feature",
+  "Mafia Google Clone",
+  "Mafia AI Tools",
+  "Mafia Dark Web",
+  "Mafia Lifestyle Secrets"
+];
+
+function showSuggestions() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const box = document.getElementById('autocompleteBox');
+  box.innerHTML = '';
+  if (!query) return;
+
+  const history = JSON.parse(localStorage.getItem("mafios_history")) || [];
+  const combined = [...new Set([...history, ...suggestionsData])];
+
+  const matched = combined.filter(item => item.toLowerCase().includes(query));
+  matched.forEach(item => {
+    const div = document.createElement('div');
+    div.classList.add('suggestion');
+    div.innerText = item;
+    div.onclick = () => {
+      document.getElementById('searchInput').value = item;
+      box.innerHTML = '';
+      search();
+    };
+    box.appendChild(div);
+  });
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#searchInput')) {
+    document.getElementById('autocompleteBox').innerHTML = '';
+  }
+});
+
   </script>
 </body>
 </html>
