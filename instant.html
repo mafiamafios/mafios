@@ -57,10 +57,12 @@
       `).join('');
     }
 
-    function instantSearch() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const box = document.getElementById('autocompleteBox');
-      box.innerHTML = '';
+    function search() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (!query) return alert("Type something to search!");
+  window.location.href = "instant.html?q=" + encodeURIComponent(query);
+}
+
 
       if (!query) {
         document.getElementById('searchResults').innerHTML = '';
