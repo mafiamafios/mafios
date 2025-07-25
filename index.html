@@ -2,33 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mafios Search</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
+    body {
+      background-color: #121212;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      letter-spacing: 0.3em;
+      margin-bottom: 30px;
+      user-select: none;
+    }
     .search-box {
       width: 90%;
       max-width: 600px;
-      margin: 20px auto;
+      margin: 0 auto 20px;
       text-align: center;
       position: relative;
     }
     #searchInput {
       width: 80%;
-      padding: 10px;
+      padding: 12px 15px;
       border-radius: 5px;
       border: none;
-      font-size: 16px;
+      font-size: 18px;
+      outline: none;
     }
     button {
-      padding: 10px 15px;
+      padding: 12px 20px;
       background: #ff3366;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
+      margin-left: 10px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #e62e5a;
     }
     .autocomplete-box {
       background: #1e1e1e;
@@ -39,11 +61,14 @@
       width: 80%;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 100;
+      z-index: 1000;
       text-align: left;
+      max-height: 180px;
+      overflow-y: auto;
+      box-shadow: 0 0 10px #ff3366aa;
     }
     .suggestion {
-      padding: 10px;
+      padding: 10px 15px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -53,35 +78,126 @@
     #results .result-item {
       background: #222;
       color: #ccc;
-      padding: 10px;
-      margin: 5px 0;
+      padding: 12px 15px;
+      margin: 8px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    #results .result-item:hover {
+      background-color: #ff3366;
+      color: white;
+    }
+    a#dashboardLink {
+      display: block;
+      margin: 20px auto;
+      max-width: 600px;
+      text-align: center;
+      font-weight: 600;
+      color: #ff3366;
+      text-decoration: none;
+      user-select: none;
+    }
+    a#dashboardLink:hover {
+      text-decoration: underline;
+    }
+    /* 3 dots menu */
+    .menu {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1100;
+    }
+    .menu-btn {
+      background: transparent;
+      border: none;
+      color: #ff3366;
+      font-size: 32px;
+      cursor: pointer;
+      user-select: none;
+      padding: 5px 10px;
       border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .menu-btn:hover {
+      background-color: #ff336644;
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 40px;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 0 15px #ff3366aa;
+      min-width: 180px;
+      overflow: hidden;
+      user-select: none;
+    }
+    .dropdown a {
+      display: block;
+      padding: 12px 15px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+    }
+    .dropdown a:hover {
+      background-color: #ff3366;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <div id="loader"></div>
+  <div class="menu">
+    <button class="menu-btn" aria-label="Menu" onclick="toggleMenu()">⋮</button>
+    <div class="dropdown" id="menuDropdown">
+      <a href="edit-profile.html">Edit Profile</a>
+      <a href="#" onclick="alert('Change Username feature coming soon!')">Change Username</a>
+      <a href="#" onclick="alert('Change Email feature coming soon!')">Change Email</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
   <h1>
     <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
   </h1>
+
   <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search Mafios world..." oninput="showSuggestions()" />
+    <input type="text" id="searchInput" placeholder="Search Mafios world..." oninput="showSuggestions()" autocomplete="off" />
     <button onclick="search()">Search</button>
     <div class="autocomplete-box" id="autocompleteBox"></div>
-    <a href="dashboard.html" style="display:block;margin-top:10px;color:#ff3366;">Go to Dashboard</a>
+    <a href="dashboard.html" id="dashboardLink">Go to Dashboard</a>
   </div>
 
   <div id="results"></div>
 
   <script>
-    setTimeout(() => {
-      document.getElementById("loader").style.display = "none";
-    }, 2000);
-
     const supabaseClient = supabase.createClient(
       "https://gmexnhcawqfndbtsqauj.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
     );
+
+    // Toggle 3 dots menu
+    function toggleMenu() {
+      const menu = document.getElementById('menuDropdown');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = "login.html";
+    }
+
+    // Close dropdown if clicked outside
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('menuDropdown');
+      const btn = document.querySelector('.menu-btn');
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
 
     function search() {
       const query = document.getElementById('searchInput').value.trim();
@@ -90,25 +206,44 @@
       // Save history
       let history = JSON.parse(localStorage.getItem("mafios_history")) || [];
       history.unshift(query);
+      history = [...new Set(history)]; // remove duplicates
       localStorage.setItem("mafios_history", JSON.stringify(history.slice(0, 5)));
 
-      // Show result (demo)
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = `<div class='result-item'>Result for: ${query}</div>` +
-        history.map(h => `<div class='result-item'>History: ${h}</div>`).join('');
+      // Show results (demo)
+      renderResults(query);
     }
 
     const suggestionsData = [
-      "Mafia World News",
-      "Mafia Chat",
-      "Mafia Resell Shop",
-      "Mafia Fashion",
-      "Mafia Queen Suits",
-      "Mafia Chat Voice Feature",
-      "Mafia Google Clone",
-      "Mafia AI Tools",
-      "Mafia Dark Web",
-      "Mafia Lifestyle Secrets"
+      {
+        title: "Mafia World News",
+        url: "#",
+        desc: "Get latest mafia updates, power moves, and secret plans.",
+        img: "https://source.unsplash.com/100x80/?news"
+      },
+      {
+        title: "Mafia Resell Shop",
+        url: "https://mafiaresell.com",
+        desc: "Premium resell items and mafia fashion collection.",
+        img: "https://source.unsplash.com/100x80/?shop"
+      },
+      {
+        title: "Mafia Chat App",
+        url: "#",
+        desc: "Join the most secretive mafia chat rooms.",
+        img: "https://source.unsplash.com/100x80/?chat"
+      },
+      {
+        title: "Mafia AI Tools",
+        url: "#",
+        desc: "Discover mafia-powered AI services.",
+        img: "https://source.unsplash.com/100x80/?ai"
+      },
+      {
+        title: "Mafia Lifestyle Secrets",
+        url: "#",
+        desc: "Live like a mafia boss with hidden tricks.",
+        img: "https://source.unsplash.com/100x80/?luxury"
+      }
     ];
 
     function showSuggestions() {
@@ -118,7 +253,7 @@
       if (!query) return;
 
       const history = JSON.parse(localStorage.getItem("mafios_history")) || [];
-      const combined = [...new Set([...history, ...suggestionsData])];
+      const combined = [...new Set([...history, ...suggestionsData.map(i => i.title)])];
 
       const matched = combined.filter(item => item.toLowerCase().includes(query));
       matched.forEach(item => {
@@ -134,11 +269,24 @@
       });
     }
 
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('#searchInput')) {
-        document.getElementById('autocompleteBox').innerHTML = '';
+    function renderResults(query) {
+      const resultsDiv = document.getElementById('results');
+      const filtered = suggestionsData.filter(item => 
+        item.title.toLowerCase().includes(query.toLowerCase())
+      );
+
+      if(filtered.length === 0) {
+        resultsDiv.innerHTML = `<div class='result-item'>No results found for: <strong>${query}</strong></div>`;
+        return;
       }
-    });
+
+      resultsDiv.innerHTML = filtered.map(item => `
+        <div class="result-item" onclick="window.open('${item.url}', '_blank')">
+          <strong>${item.title}</strong><br />
+          <small>${item.desc}</small>
+        </div>
+      `).join('');
+    }
   </script>
 </body>
 </html>
