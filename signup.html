@@ -8,67 +8,31 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     body {
-      background: linear-gradient(135deg, #000, #1a1a1a);
+      background: #000;
       color: #fff;
-      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 40px;
-      text-shadow: 0 0 10px #ff0033, 0 0 20px #ff3366;
-      margin-bottom: 20px;
-      letter-spacing: 3px;
     }
     form {
-      background: rgba(30, 30, 30, 0.9);
+      background: #1a1a1a;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-      width: 100%;
-      max-width: 350px;
+      border-radius: 8px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
     }
-    input {
+    input, button {
       padding: 10px;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      background: #222;
-      color: #fff;
-      outline: none;
+      border-radius: 5px;
     }
     button {
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
       background: #ff0033;
-      color: white;
-      font-weight: bold;
+      color: #fff;
       cursor: pointer;
-      transition: 0.3s;
-      font-size: 16px;
-    }
-    button:hover {
-      background: #ff3366;
-      box-shadow: 0 0 10px #ff3366;
-    }
-    a {
-      color: #ff3366;
-      text-decoration: none;
-      font-size: 14px;
-      text-align: center;
-      margin-top: 10px;
-      display: inline-block;
-    }
-    a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
@@ -92,12 +56,14 @@
       const email = document.getElementById("signupEmail").value;
       const password = document.getElementById("signupPassword").value;
 
-      const { error } = await supabaseClient.auth.signUp({ email, password });
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
       if (error) {
         alert(error.message);
       } else {
-        alert("Check your email for confirmation!");
-        window.location.href = "login.html";
+        const user = data.user;
+        const randomName = email.split('@')[0] + "_" + Math.floor(Math.random() * 1000);
+        await supabaseClient.from('profiles').insert([{ id: user.id, mafios_id: randomName + "@mafios" }]);
+        window.location.href = "welcome.html";
       }
     });
   </script>
