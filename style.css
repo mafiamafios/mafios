@@ -106,3 +106,24 @@ form { width: 300px; display: flex; flex-direction: column; }
   background: #2b2b2b;
   color: #ff3366;
 }
+.mic-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.mic-btn img {
+  width: 30px;
+  height: 30px;
+}
+.mic-btn.recording img {
+  filter: drop-shadow(0 0 10px red);
+  animation: pulse 0.8s infinite alternate;
+}
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
