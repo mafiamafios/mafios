@@ -31,6 +31,14 @@
   </h1>
   <div class="search-wrapper">
     <input type="text" id="searchInput" placeholder="Type to search..." oninput="instantSearch()" />
+    <div class="search-wrapper" style="position: relative;">
+  <input type="text" id="searchInput" placeholder="Type or speak to search..." oninput="instantSearch()" />
+  <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()">
+    <img src="https://cdn-icons-png.flaticon.com/512/2950/2950258.png" alt="mic">
+  </button>
+  <div class="autocomplete-box" id="autocompleteBox"></div>
+</div>
+
     <div class="autocomplete-box" id="autocompleteBox"></div>
   </div>
   <div class="search-results" id="searchResults"></div>
