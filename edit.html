@@ -5,20 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Profile - Mafios</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #0a0a0a;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .box {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+    h2.glow {
+      color: #ff3366;
+      text-shadow: 0 0 10px #ff3366, 0 0 20px #ff3366;
+      margin-bottom: 20px;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff3366; }
+      to { text-shadow: 0 0 30px #ff3366, 0 0 60px #ff3366; }
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #333;
+      border: none;
+      border-radius: 5px;
+      color: white;
+    }
+    button {
+      width: 100%;
+      background: #ff3366;
+      border: none;
+      padding: 12px;
+      margin-top: 10px;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ff6688;
+      box-shadow: 0 0 10px #ff3366;
+    }
+    .preview-img {
+      margin-top: 15px;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #ff3366;
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div class="box">
     <h2 class="glow">Edit Your Profile</h2>
     <input type="text" id="username" placeholder="New Mafios Username">
-    <input type="file" id="uploadPic" accept="image/*">
-    <button onclick="updateProfile()">Save Changes</button>
-    <button onclick="goBack()">Back to Dashboard</button>
+    <input type="file" id="uploadPic" accept="image/*" onchange="previewImage(event)">
+    <img id="preview" class="preview-img" src="" alt="Preview">
+    <button onclick="updateProfile()">💾 Save Changes</button>
+    <button onclick="goBack()">⬅️ Back to Dashboard</button>
   </div>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://gmexnhcawqfndbtsqauj.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentUser = null;
 
@@ -54,6 +120,16 @@
 
     function goBack() {
       window.location.href = "dashboard.html";
+    }
+
+    function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const output = document.getElementById('preview');
+        output.src = reader.result;
+        output.style.display = "block";
+      };
+      reader.readAsDataURL(event.target.files[0]);
     }
 
     getCurrentUser();
