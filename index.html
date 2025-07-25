@@ -31,8 +31,11 @@
     );
 
     function search() {
-      const query = document.getElementById('searchInput').value.trim();
-      if(!query) return alert("Type something to search!");
+  const query = document.getElementById('searchInput').value.trim();
+  if(!query) return alert("Type something to search!");
+  window.location.href = "search.html?q=" + encodeURIComponent(query);
+}
+
 
       // Save history in localStorage
       let history = JSON.parse(localStorage.getItem("mafios_history")) || [];
