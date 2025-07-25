@@ -9,30 +9,45 @@
 </head>
 <body>
   <div id="loader"></div>
-  <h1>MAFIOS</h1>
+  <h1>
+    <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
+  </h1>
   <div class="search-box">
-    <input type="text" placeholder="Search Mafios world..." />
+    <input type="text" id="searchInput" placeholder="Search Mafios world..." />
     <button onclick="search()">Search</button>
     <a href="dashboard.html">Go to Dashboard</a>
   </div>
 
+  <div id="results"></div>
+
   <script>
     setTimeout(() => {
       document.getElementById("loader").style.display = "none";
-    }, 3000);
-
-    function search() {
-      alert("Search system coming soon, Jan 😎");
-    }
+    }, 2000);
 
     const supabaseClient = supabase.createClient(
       "https://gmexnhcawqfndbtsqauj.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
     );
 
+    function search() {
+      const query = document.getElementById('searchInput').value.trim();
+      if(!query) return alert("Type something to search!");
+
+      // Save history in localStorage
+      let history = JSON.parse(localStorage.getItem("mafios_history")) || [];
+      history.unshift(query);
+      localStorage.setItem("mafios_history", JSON.stringify(history.slice(0, 5)));
+
+      // Display results (demo)
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = `<div class='result-item'>Result for: ${query}</div>` +
+        history.map(h => `<div class='result-item'>History: ${h}</div>`).join('');
+    }
+
     supabaseClient.auth.getUser().then(({ data }) => {
       if (!data.user) {
-        window.location.href = "login.html";
+        console.log("Guest Mode: User not logged in");
       }
     });
   </script>
