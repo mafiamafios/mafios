@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile - Mafios</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="box">
+    <h2 class="glow">Edit Your Profile</h2>
+    <input type="text" id="username" placeholder="New Mafios Username">
+    <input type="file" id="uploadPic" accept="image/*">
+    <button onclick="updateProfile()">Save Changes</button>
+    <button onclick="goBack()">Back to Dashboard</button>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://gmexnhcawqfndbtsqauj.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentUser = null;
+
+    async function getCurrentUser() {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        currentUser = data.user;
+      } else {
+        window.location.href = "login.html";
+      }
+    }
+
+    async function updateProfile() {
+      const username = document.getElementById('username').value.trim();
+      let updateData = {};
+      if (username) {
+        updateData.mafios_id = username + "@mafios";
+      }
+      const file = document.getElementById('uploadPic').files[0];
+      if (file) {
+        const fileName = currentUser.id + "-" + file.name;
+        const { data, error } = await supabase.storage.from('avatars').upload(fileName, file, { upsert: true });
+        if (!error) {
+          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+          updateData.profile_pic = urlData.publicUrl;
+        }
+      }
+      if (Object.keys(updateData).length > 0) {
+        await supabase.from('profiles').update(updateData).eq('id', currentUser.id);
+        alert("Profile updated!");
+      }
+    }
+
+    function goBack() {
+      window.location.href = "dashboard.html";
+    }
+
+    getCurrentUser();
+  </script>
+</body>
+</html>

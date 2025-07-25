@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
 body {
   font-family: 'Poppins', sans-serif;
   background: radial-gradient(circle at top, #0a0a0a, #000);
@@ -8,15 +10,32 @@ body {
   height: 100vh;
   margin: 0;
 }
+
+.glow {
+  animation: glowEffect 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glowEffect {
+  from { text-shadow: 0 0 5px #ff0040, 0 0 10px #ff0040; }
+  to { text-shadow: 0 0 15px #ff3366, 0 0 20px #ff0040; }
+}
+
 .box {
-  background: #1b1b1b;
+  background: rgba(27,27,27,0.9);
   padding: 30px;
   border-radius: 20px;
   width: 380px;
   text-align: center;
-  box-shadow: 0 0 30px rgba(255, 0, 64, 0.3);
+  box-shadow: 0 0 30px rgba(255, 0, 64, 0.4);
   position: relative;
+  animation: fadeIn 1s ease-in;
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 button {
   background: #ff0040;
   color: white;
@@ -27,10 +46,12 @@ button {
   margin-top: 15px;
   font-weight: bold;
   letter-spacing: 1px;
+  transition: 0.3s;
 }
 button:hover {
   background: #ff3366;
 }
+
 input {
   width: 90%;
   padding: 12px;
@@ -40,9 +61,11 @@ input {
   background: #2b2b2b;
   color: white;
 }
+
 input::placeholder {
   color: #bbb;
 }
+
 .profile-pic {
   width: 100px;
   height: 100px;
@@ -50,7 +73,9 @@ input::placeholder {
   object-fit: cover;
   border: 3px solid #ff0040;
   margin-bottom: 15px;
+  box-shadow: 0 0 10px #ff0040;
 }
+
 a {
   color: #ff3366;
   text-decoration: none;
