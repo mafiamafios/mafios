@@ -6,7 +6,54 @@
   <title>Mafios Search Results</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .search-results { max-width: 800px; width: 100%; margin-top: 20px; }
+    body {
+      background: linear-gradient(135deg, #000, #111);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 span {
+      font-size: 45px;
+      color: #ff0033;
+      text-shadow: 0 0 10px #ff3366, 0 0 20px #ff0033;
+      display: inline-block;
+      margin: 0 2px;
+    }
+    .search-box {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      gap: 10px;
+    }
+    .search-box input {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      width: 250px;
+      background: #222;
+      color: #fff;
+    }
+    .search-box button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #ff0033;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .search-box button:hover {
+      background: #ff3366;
+      box-shadow: 0 0 10px #ff3366;
+    }
+    .search-results {
+      max-width: 800px;
+      margin: 20px auto;
+      text-align: left;
+    }
     .card {
       background: #1e1e1e;
       padding: 15px;
@@ -15,7 +62,12 @@
       display: flex;
       align-items: center;
       gap: 15px;
-      transition: transform 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    }
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px #ff0033;
     }
     .card img {
       width: 100px;
@@ -23,7 +75,6 @@
       object-fit: cover;
       border-radius: 8px;
     }
-    .card:hover { transform: scale(1.02); }
     .card-content a {
       color: #ff3366;
       font-size: 18px;
@@ -41,7 +92,7 @@
   <h1>
     <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
   </h1>
-  <div class="search-box" style="flex-direction: row; gap:10px;">
+  <div class="search-box">
     <input type="text" id="searchInput" placeholder="Search again..." />
     <button onclick="newSearch()">Search</button>
   </div>
@@ -63,11 +114,10 @@
         resultsDiv.innerHTML = "<p>No search term provided.</p>";
         return;
       }
-      // Demo data
       const demoResults = [
         { title: "Mafia World News", url: "#", desc: "Get latest mafia updates, power moves, and secret plans.", img: "https://source.unsplash.com/100x80/?news" },
         { title: "Mafia Resell Shop", url: "https://mafiaresell.com", desc: "Premium resell items and mafia fashion collection.", img: "https://source.unsplash.com/100x80/?shop" },
-        { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/100x80/?chat" },
+        { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/100x80/?chat" }
       ];
 
       resultsDiv.innerHTML = demoResults.map(item => `
