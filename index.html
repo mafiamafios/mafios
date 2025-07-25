@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mafios Search</title>
+  <title>Mafios Search with Voice + Images</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
@@ -29,9 +29,12 @@
       margin: 0 auto 20px;
       text-align: center;
       position: relative;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
     }
     #searchInput {
-      width: 80%;
+      flex: 1;
       padding: 12px 15px;
       border-radius: 5px;
       border: none;
@@ -46,11 +49,29 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
-      margin-left: 10px;
       transition: background-color 0.3s ease;
     }
     button:hover {
       background: #e62e5a;
+    }
+    .mic-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      width: 40px;
+      height: 40px;
+      filter: invert(76%) sepia(50%) saturate(5147%) hue-rotate(328deg) brightness(94%) contrast(101%);
+      transition: filter 0.3s ease;
+      margin-left: 5px;
+    }
+    .mic-btn.recording {
+      filter: invert(50%) sepia(100%) saturate(800%) hue-rotate(330deg) brightness(120%) contrast(120%);
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { filter: invert(50%) sepia(100%) saturate(800%) hue-rotate(330deg) brightness(120%) contrast(120%);}
+      50% { filter: invert(30%) sepia(100%) saturate(1000%) hue-rotate(330deg) brightness(150%) contrast(150%);}
     }
     .autocomplete-box {
       background: #1e1e1e;
@@ -58,9 +79,8 @@
       border-radius: 5px;
       margin-top: 5px;
       position: absolute;
-      width: 80%;
-      left: 50%;
-      transform: translateX(-50%);
+      width: 100%;
+      left: 0;
       z-index: 1000;
       text-align: left;
       max-height: 180px;
@@ -75,7 +95,12 @@
     .suggestion:hover {
       background: #333;
     }
-    #results .result-item {
+    #results {
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    /* Result cards for text search */
+    .result-item {
       background: #222;
       color: #ccc;
       padding: 12px 15px;
@@ -83,10 +108,39 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.2s ease;
+      display: flex;
+      gap: 15px;
+      align-items: center;
     }
-    #results .result-item:hover {
+    .result-item:hover {
       background-color: #ff3366;
       color: white;
+    }
+    .result-item img {
+      width: 100px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    /* Image grid for images search */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 10px;
+    }
+    .image-grid img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .image-grid img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ff3366;
     }
     a#dashboardLink {
       display: block;
@@ -167,6 +221,9 @@
   <div class="search-box">
     <input type="text" id="searchInput" placeholder="Search Mafios world..." oninput="showSuggestions()" autocomplete="off" />
     <button onclick="search()">Search</button>
+    <button class="mic-btn" id="micBtn" title="Voice Search" onclick="startVoiceSearch()">
+      <img src="https://cdn-icons-png.flaticon.com/512/2950/2950258.png" alt="mic" width="24" height="24" />
+    </button>
     <div class="autocomplete-box" id="autocompleteBox"></div>
     <a href="dashboard.html" id="dashboardLink">Go to Dashboard</a>
   </div>
@@ -199,53 +256,6 @@
       }
     });
 
-    function search() {
-      const query = document.getElementById('searchInput').value.trim();
-      if (!query) return alert("Type something to search!");
-
-      // Save history
-      let history = JSON.parse(localStorage.getItem("mafios_history")) || [];
-      history.unshift(query);
-      history = [...new Set(history)]; // remove duplicates
-      localStorage.setItem("mafios_history", JSON.stringify(history.slice(0, 5)));
-
-      // Show results (demo)
-      renderResults(query);
-    }
-
-    const suggestionsData = [
-      {
-        title: "Mafia World News",
-        url: "#",
-        desc: "Get latest mafia updates, power moves, and secret plans.",
-        img: "https://source.unsplash.com/100x80/?news"
-      },
-      {
-        title: "Mafia Resell Shop",
-        url: "https://mafiaresell.com",
-        desc: "Premium resell items and mafia fashion collection.",
-        img: "https://source.unsplash.com/100x80/?shop"
-      },
-      {
-        title: "Mafia Chat App",
-        url: "#",
-        desc: "Join the most secretive mafia chat rooms.",
-        img: "https://source.unsplash.com/100x80/?chat"
-      },
-      {
-        title: "Mafia AI Tools",
-        url: "#",
-        desc: "Discover mafia-powered AI services.",
-        img: "https://source.unsplash.com/100x80/?ai"
-      },
-      {
-        title: "Mafia Lifestyle Secrets",
-        url: "#",
-        desc: "Live like a mafia boss with hidden tricks.",
-        img: "https://source.unsplash.com/100x80/?luxury"
-      }
-    ];
-
     function showSuggestions() {
       const query = document.getElementById('searchInput').value.toLowerCase();
       const box = document.getElementById('autocompleteBox');
@@ -269,24 +279,104 @@
       });
     }
 
-    function renderResults(query) {
+    const suggestionsData = [
+      { title: "Mafia World News", url: "#", desc: "Get latest mafia updates, power moves, and secret plans.", img: "https://source.unsplash.com/100x80/?news" },
+      { title: "Mafia Resell Shop", url: "https://mafiaresell.com", desc: "Premium resell items and mafia fashion collection.", img: "https://source.unsplash.com/100x80/?shop" },
+      { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/100x80/?chat" },
+      { title: "Mafia AI Tools", url: "#", desc: "Discover mafia-powered AI services.", img: "https://source.unsplash.com/100x80/?ai" },
+      { title: "Mafia Lifestyle Secrets", url: "#", desc: "Live like a mafia boss with hidden tricks.", img: "https://source.unsplash.com/100x80/?luxury" }
+    ];
+
+    function search() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return alert("Type something to search!");
+
+      // Save history
+      let history = JSON.parse(localStorage.getItem("mafios_history")) || [];
+      history = history.filter(h => h.toLowerCase() !== query.toLowerCase());
+      history.unshift(query);
+      localStorage.setItem("mafios_history", JSON.stringify(history.slice(0, 5)));
+
+      // Decide if search is for images
+      if (query.toLowerCase().includes("images")) {
+        renderImageResults(query);
+      } else {
+        renderTextResults(query);
+      }
+    }
+
+    function renderTextResults(query) {
       const resultsDiv = document.getElementById('results');
-      const filtered = suggestionsData.filter(item => 
+      const filtered = suggestionsData.filter(item =>
         item.title.toLowerCase().includes(query.toLowerCase())
       );
 
-      if(filtered.length === 0) {
+      if (filtered.length === 0) {
         resultsDiv.innerHTML = `<div class='result-item'>No results found for: <strong>${query}</strong></div>`;
         return;
       }
 
       resultsDiv.innerHTML = filtered.map(item => `
         <div class="result-item" onclick="window.open('${item.url}', '_blank')">
-          <strong>${item.title}</strong><br />
-          <small>${item.desc}</small>
+          <img src="${item.img}" alt="${item.title}" />
+          <div>
+            <strong>${item.title}</strong><br />
+            <small>${item.desc}</small>
+          </div>
         </div>
       `).join('');
     }
+
+    function renderImageResults(query) {
+      const resultsDiv = document.getElementById('results');
+      // Just demo random images with query as keyword from unsplash
+      const images = [];
+      for(let i=1; i<=9; i++) {
+        images.push(`https://source.unsplash.com/300x200/?${encodeURIComponent(query)},sig=${i}`);
+      }
+      resultsDiv.innerHTML = `<div class="image-grid">` +
+        images.map(src => `<img src="${src}" alt="Image result" onclick="window.open('${src}', '_blank')" />`).join('') +
+        `</div>`;
+    }
+
+    // Voice Search setup
+    let recognition;
+    function startVoiceSearch() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Voice Search not supported in your browser!");
+        return;
+      }
+
+      if (!recognition) {
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          document.getElementById("micBtn").classList.add("recording");
+        };
+
+        recognition.onend = () => {
+          document.getElementById("micBtn").classList.remove("recording");
+        };
+
+        recognition.onresult = (event) => {
+          const speechResult = event.results[0][0].transcript;
+          document.getElementById("searchInput").value = speechResult;
+          search();
+        };
+      }
+      recognition.start();
+    }
+
+    // Close suggestions on click outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#searchInput')) {
+        document.getElementById('autocompleteBox').innerHTML = '';
+      }
+    });
+
   </script>
 </body>
 </html>
