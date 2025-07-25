@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Mafios</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="box">
+    <h2>Welcome to Mafios!</h2>
+    <p id="userMafios"></p>
+    <button onclick="goToDashboard()">Continue to Dashboard</button>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = supabase.createClient(
+      "https://gmexnhcawqfndbtsqauj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
+    );
+
+    async function loadProfile() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) window.location.href = "login.html";
+      const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+      document.getElementById('userMafios').innerText = `Your ID: ${data.mafios_id}`;
+    }
+
+    function goToDashboard() {
+      window.location.href = "dashboard.html";
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>
