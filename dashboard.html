@@ -5,96 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mafia Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body {
-      background: #0d0d0d;
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-      margin: 0;
+    .menu {
+      position: absolute;
+      top: 15px;
+      right: 15px;
     }
-    h1 {
-      font-size: 40px;
-      color: #ff3366;
-      text-shadow: 0 0 20px #ff3366, 0 0 40px #ff3366;
-      animation: glow 2s ease-in-out infinite alternate;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #ff3366; }
-      to { text-shadow: 0 0 30px #ff3366, 0 0 50px #ff3366; }
-    }
-    .profile-card {
-      background: #1c1c1c;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
-      width: 300px;
-      text-align: center;
-      margin-top: 20px;
-    }
-    .profile-card img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 3px solid #ff3366;
-      margin-bottom: 10px;
-    }
-    .logout-btn {
-      background: #ff3366;
+    .menu-btn {
+      background: none;
       border: none;
-      padding: 10px 20px;
-      color: white;
-      border-radius: 5px;
-      margin-top: 15px;
-      font-size: 16px;
+      font-size: 24px;
+      color: #fff;
       cursor: pointer;
-      transition: 0.3s;
     }
-    .logout-btn:hover {
-      background: #ff6688;
-      box-shadow: 0 0 15px #ff3366;
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: #1e1e1e;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .dropdown a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 14px;
+    }
+    .dropdown a:hover {
+      background: #ff0033;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Mafia Dashboard</h1>
-  <div class="profile-card">
-    <img id="userAvatar" src="https://i.ibb.co/ZmFb7P4/default-avatar.png" alt="User Avatar">
-    <h2 id="userEmail">Loading...</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+  <div class="menu">
+    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+    <div class="dropdown" id="menuDropdown">
+      <a href="edit-profile.html">Edit Profile</a>
+      <a href="#">Change Username</a>
+      <a href="#">Change Email</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
   </div>
 
+  <h1>Welcome to Mafia Dashboard</h1>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const supabaseClient = supabase.createClient(
       "https://gmexnhcawqfndbtsqauj.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
     );
 
-    // Show user email on dashboard
-    async function loadUser() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (user) {
-        document.getElementById("userEmail").innerText = user.email;
-        if (user.user_metadata && user.user_metadata.avatar_url) {
-          document.getElementById("userAvatar").src = user.user_metadata.avatar_url;
-        }
-      } else {
-        window.location.href = "login.html";
-      }
+    function toggleMenu() {
+      const menu = document.getElementById('menuDropdown');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
     async function logout() {
       await supabaseClient.auth.signOut();
       window.location.href = "login.html";
     }
-
-    loadUser();
   </script>
 </body>
 </html>
