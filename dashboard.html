@@ -2,54 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mafia Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 3rem;
+      letter-spacing: 0.2em;
+      user-select: none;
+    }
     .menu {
-      position: absolute;
+      position: fixed;
       top: 15px;
       right: 15px;
+      z-index: 100;
     }
     .menu-btn {
-      background: none;
+      background: transparent;
       border: none;
-      font-size: 24px;
-      color: #fff;
+      color: #ff0033;
+      font-size: 32px;
       cursor: pointer;
+      user-select: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .menu-btn:hover {
+      background-color: #ff003344;
     }
     .dropdown {
       display: none;
       position: absolute;
       right: 0;
-      background: #1e1e1e;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+      top: 40px;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ff0033aa;
+      min-width: 180px;
+      overflow: hidden;
+      user-select: none;
     }
     .dropdown a {
       display: block;
-      padding: 10px;
-      text-decoration: none;
+      padding: 12px 15px;
       color: #fff;
+      text-decoration: none;
+      font-weight: 600;
       font-size: 14px;
+      transition: background-color 0.2s ease;
     }
     .dropdown a:hover {
-      background: #ff0033;
+      background-color: #ff0033;
+      color: #fff;
+    }
+    /* Placeholder grid container */
+    .content {
+      margin-top: 80px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #222;
+      border-radius: 12px;
+      padding: 15px;
+      color: #fff;
+      text-align: center;
+      font-weight: 700;
+      box-shadow: 0 0 8px #ff0033aa;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff0033ff;
     }
   </style>
 </head>
 <body>
+
   <div class="menu">
-    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+    <button class="menu-btn" aria-label="Menu" onclick="toggleMenu()">⋮</button>
     <div class="dropdown" id="menuDropdown">
       <a href="edit-profile.html">Edit Profile</a>
-      <a href="#">Change Username</a>
-      <a href="#">Change Email</a>
+      <a href="#" onclick="alert('Change Username feature coming soon!')">Change Username</a>
+      <a href="#" onclick="alert('Change Email feature coming soon!')">Change Email</a>
       <a href="#" onclick="logout()">Logout</a>
     </div>
   </div>
 
   <h1>Welcome to Mafia Dashboard</h1>
+
+  <div class="content" id="contentGrid">
+    <!-- Placeholder cards -->
+    <div class="card">Mafia News</div>
+    <div class="card">Mafia Resell Shop</div>
+    <div class="card">Mafia Chat</div>
+    <div class="card">Mafia AI Tools</div>
+    <div class="card">Mafia Lifestyle</div>
+    <div class="card">Mafia Dark Web</div>
+  </div>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
@@ -67,6 +134,16 @@
       await supabaseClient.auth.signOut();
       window.location.href = "login.html";
     }
+
+    // Close dropdown if clicked outside
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('menuDropdown');
+      const btn = document.querySelector('.menu-btn');
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
+
   </script>
 </body>
 </html>
