@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #111, #222);
+  background: linear-gradient(135deg, #000, #111);
   color: white;
   display: flex;
   justify-content: center;
@@ -14,10 +14,10 @@ body {
   border-radius: 15px;
   width: 350px;
   text-align: center;
-  box-shadow: 0 0 15px rgba(0,0,0,0.8);
+  box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
 button {
-  background: #ff0055;
+  background: #ff0040;
   color: white;
   padding: 10px 20px;
   border: none;
