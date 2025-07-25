@@ -1,82 +1,67 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
+* { box-sizing: border-box; }
 body {
-  font-family: 'Poppins', sans-serif;
-  background: radial-gradient(circle at top, #0a0a0a, #000);
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
-}
-
-.glow {
-  animation: glowEffect 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes glowEffect {
-  from { text-shadow: 0 0 5px #ff0040, 0 0 10px #ff0040; }
-  to { text-shadow: 0 0 15px #ff3366, 0 0 20px #ff0040; }
-}
-
-.box {
-  background: rgba(27,27,27,0.9);
-  padding: 30px;
-  border-radius: 20px;
-  width: 380px;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(255, 0, 64, 0.4);
-  position: relative;
-  animation: fadeIn 1s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-button {
-  background: #ff0040;
+  padding: 0;
+  background: #0d0d0d;
   color: white;
-  padding: 12px 20px;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+#loader {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #0d0d0d url('https://media.tenor.com/qfTzVeEp9YcAAAAi/blood-splatter.gif') no-repeat center center;
+  background-size: 400px;
+  z-index: 9999;
+}
+h1 {
+  font-size: 64px;
+  letter-spacing: 5px;
+  color: #ff003c;
+  text-shadow: 0 0 10px #ff003c, 0 0 20px #ff004c;
+  animation: glowTitle 1.5s infinite alternate;
+  margin-bottom: 20px;
+}
+@keyframes glowTitle {
+  from { text-shadow: 0 0 10px #ff003c; }
+  to { text-shadow: 0 0 30px #ff3366; }
+}
+.search-box {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%; max-width: 500px;
+  display: flex; flex-direction: column; align-items: center;
+}
+input[type="text"], input[type="email"], input[type="password"] {
+  padding: 15px;
+  width: 100%;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: #2b2b2b;
+  color: white;
+  margin-bottom: 20px;
+}
+button {
+  padding: 10px 25px;
+  background: #ff003c;
+  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 15px;
+  font-size: 16px;
   font-weight: bold;
-  letter-spacing: 1px;
-  transition: 0.3s;
+  transition: background 0.3s;
 }
-button:hover {
-  background: #ff3366;
-}
-
-input {
-  width: 90%;
-  padding: 12px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 8px;
-  background: #2b2b2b;
-  color: white;
-}
-
-input::placeholder {
-  color: #bbb;
-}
-
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #ff0040;
-  margin-bottom: 15px;
-  box-shadow: 0 0 10px #ff0040;
-}
-
-a {
-  color: #ff3366;
-  text-decoration: none;
-}
+button:hover { background: #ff3366; }
+a { color: #ff3366; margin-top: 15px; text-decoration: none; }
+form { width: 300px; display: flex; flex-direction: column; }
