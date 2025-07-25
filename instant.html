@@ -102,6 +102,36 @@
         document.getElementById('autocompleteBox').innerHTML = '';
       }
     });
+    let recognition;
+function startVoiceSearch() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("Voice Search not supported in your browser!");
+    return;
+  }
+
+  if (!recognition) {
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      document.getElementById("micBtn").classList.add("recording");
+    };
+
+    recognition.onend = () => {
+      document.getElementById("micBtn").classList.remove("recording");
+    };
+
+    recognition.onresult = (event) => {
+      const speechResult = event.results[0][0].transcript;
+      document.getElementById("searchInput").value = speechResult;
+      instantSearch();
+    };
+  }
+  recognition.start();
+}
+
   </script>
 </body>
 </html>
