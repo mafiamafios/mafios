@@ -23,6 +23,26 @@
     .card:hover { transform: scale(1.02); }
     .card-content a { color: #ff3366; font-size: 18px; text-decoration: none; font-weight: bold; }
     .card-content p { margin: 5px 0 0; font-size: 14px; color: #ccc; }
+
+    /* Mic Button */
+    .mic-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .mic-btn img { width: 30px; height: 30px; }
+    .mic-btn.recording img {
+      filter: drop-shadow(0 0 10px red);
+      animation: pulse 0.8s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.2); }
+    }
   </style>
 </head>
 <body>
@@ -30,15 +50,10 @@
     <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
   </h1>
   <div class="search-wrapper">
-    <input type="text" id="searchInput" placeholder="Type to search..." oninput="instantSearch()" />
-    <div class="search-wrapper" style="position: relative;">
-  <input type="text" id="searchInput" placeholder="Type or speak to search..." oninput="instantSearch()" />
-  <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()">
-    <img src="https://cdn-icons-png.flaticon.com/512/2950/2950258.png" alt="mic">
-  </button>
-  <div class="autocomplete-box" id="autocompleteBox"></div>
-</div>
-
+    <input type="text" id="searchInput" placeholder="Type or speak to search..." oninput="instantSearch()" />
+    <button class="mic-btn" id="micBtn" onclick="startVoiceSearch()">
+      <img src="https://cdn-icons-png.flaticon.com/512/2950/2950258.png" alt="mic">
+    </button>
     <div class="autocomplete-box" id="autocompleteBox"></div>
   </div>
   <div class="search-results" id="searchResults"></div>
@@ -49,38 +64,48 @@
       { title: "Mafia Resell Shop", url: "https://mafiaresell.com", desc: "Premium resell items and mafia fashion collection.", img: "https://source.unsplash.com/100x80/?shop" },
       { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/100x80/?chat" },
       { title: "Mafia AI Tools", url: "#", desc: "Discover mafia-powered AI services.", img: "https://source.unsplash.com/100x80/?ai" },
-      { title: "Mafia Lifestyle Secrets", url: "#", desc: "Live like a mafia boss with hidden tricks.", img: "https://source.unsplash.com/100x80/?luxury" }
+      { title: "Mafia Lifestyle Secrets", url: "#", desc: "Live like a mafia boss with hidden tricks.", img: "https://source.unsplash.com/100x80/?luxury" },
+      { title: "Mafia Image Gallery", url: "#", desc: "", img: "https://source.unsplash.com/400x300/?mafia" },
+      { title: "Mafia Photos", url: "#", desc: "", img: "https://source.unsplash.com/400x300/?gangster" }
     ];
 
-    function renderResults(data) {
+    function renderResults(data, isImageGrid = false) {
       const resultsDiv = document.getElementById('searchResults');
-      resultsDiv.innerHTML = data.map(item => `
-        <div class="card">
-          <img src="${item.img}" alt="img"/>
-          <div class="card-content">
-            <a href="${item.url}" target="_blank">${item.title}</a>
-            <p>${item.desc}</p>
+      if (isImageGrid) {
+        resultsDiv.innerHTML = `
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
+            ${data.map(item => `
+              <a href="${item.url}" target="_blank" style="border-radius:10px; overflow:hidden;">
+                <img src="${item.img}" alt="${item.title}" style="width:100%; height:150px; object-fit:cover;"/>
+              </a>
+            `).join('')}
           </div>
-        </div>
-      `).join('');
+        `;
+      } else {
+        resultsDiv.innerHTML = data.map(item => `
+          <div class="card">
+            <img src="${item.img}" alt="img"/>
+            <div class="card-content">
+              <a href="${item.url}" target="_blank">${item.title}</a>
+              <p>${item.desc}</p>
+            </div>
+          </div>
+        `).join('');
+      }
     }
 
-    function search() {
-  const query = document.getElementById('searchInput').value.trim();
-  if (!query) return alert("Type something to search!");
-  window.location.href = "instant.html?q=" + encodeURIComponent(query);
-}
-
+    function instantSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const box = document.getElementById('autocompleteBox');
+      box.innerHTML = '';
 
       if (!query) {
         document.getElementById('searchResults').innerHTML = '';
         return;
       }
 
-      // Filtered results
       const matched = suggestionsData.filter(item => item.title.toLowerCase().includes(query));
 
-      // Autocomplete
       matched.forEach(item => {
         const div = document.createElement('div');
         div.classList.add('suggestion');
@@ -88,13 +113,14 @@
         div.onclick = () => {
           document.getElementById('searchInput').value = item.title;
           box.innerHTML = '';
-          renderResults([item]);
+          const isImageSearch = /image|images|photo|photos|pic|pics/i.test(item.title);
+          renderResults([item], isImageSearch);
         };
         box.appendChild(div);
       });
 
-      // Live results
-      renderResults(matched);
+      const isImageSearch = /image|images|photo|photos|pic|pics/i.test(query);
+      renderResults(matched, isImageSearch);
     }
 
     document.addEventListener('click', (e) => {
@@ -102,36 +128,37 @@
         document.getElementById('autocompleteBox').innerHTML = '';
       }
     });
+
+    // Voice Search
     let recognition;
-function startVoiceSearch() {
-  if (!('webkitSpeechRecognition' in window)) {
-    alert("Voice Search not supported in your browser!");
-    return;
-  }
+    function startVoiceSearch() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Voice Search not supported in your browser!");
+        return;
+      }
 
-  if (!recognition) {
-    recognition = new webkitSpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+      if (!recognition) {
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => {
-      document.getElementById("micBtn").classList.add("recording");
-    };
+        recognition.onstart = () => {
+          document.getElementById("micBtn").classList.add("recording");
+        };
 
-    recognition.onend = () => {
-      document.getElementById("micBtn").classList.remove("recording");
-    };
+        recognition.onend = () => {
+          document.getElementById("micBtn").classList.remove("recording");
+        };
 
-    recognition.onresult = (event) => {
-      const speechResult = event.results[0][0].transcript;
-      document.getElementById("searchInput").value = speechResult;
-      instantSearch();
-    };
-  }
-  recognition.start();
-}
-
+        recognition.onresult = (event) => {
+          const speechResult = event.results[0][0].transcript;
+          document.getElementById("searchInput").value = speechResult;
+          instantSearch();
+        };
+      }
+      recognition.start();
+    }
   </script>
 </body>
 </html>
