@@ -1,47 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Mafios ID</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup - Mafios</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div class="box">
-    <h2 class="glow">Create Mafios ID</h2>
-    <input type="text" id="username" placeholder="Mafios Username (e.g., kiran.gashti)" required>
-    <input type="email" id="email" placeholder="Your Real Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button onclick="signup()">Signup</button>
-    <p>Already have an account? <a href="login.html">Login</a></p>
-  </div>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <h1>Create Mafia ID</h1>
+  <form id="signupForm">
+    <input type="email" id="signupEmail" placeholder="Email" required/>
+    <input type="password" id="signupPassword" placeholder="Password" required/>
+    <button type="submit">Signup</button>
+    <a href="login.html">Already have an account? Login</a>
+  </form>
   <script>
-    const SUPABASE_URL = "https://gmexnhcawqfndbtsqauj.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = supabase.createClient(
+      "https://gmexnhcawqfndbtsqauj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
+    );
 
-    async function signup() {
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      if (!username || !email) {
-        alert('Please enter all fields.');
-        return;
-      }
-      const mafiosId = username + "@mafios";
-      const { data, error } = await supabase.auth.signUp({ email, password });
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      const { error } = await supabaseClient.auth.signUp({ email, password });
       if (error) {
         alert(error.message);
       } else {
-        const user = data.user;
-        if (user) {
-          await supabase.from('profiles').upsert([{ id: user.id, mafios_id: mafiosId }]);
-        }
-        alert('Signup successful! Check your email for confirmation.');
+        alert("Check your email for confirmation!");
         window.location.href = "login.html";
       }
-    }
+    });
   </script>
 </body>
 </html>
