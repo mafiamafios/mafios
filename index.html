@@ -6,6 +6,58 @@
   <title>Mafios Search</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    .search-box {
+      width: 90%;
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      position: relative;
+    }
+    #searchInput {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 15px;
+      background: #ff3366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .autocomplete-box {
+      background: #1e1e1e;
+      color: white;
+      border-radius: 5px;
+      margin-top: 5px;
+      position: absolute;
+      width: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      text-align: left;
+    }
+    .suggestion {
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .suggestion:hover {
+      background: #333;
+    }
+    #results .result-item {
+      background: #222;
+      color: #ccc;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
   <div id="loader"></div>
@@ -13,12 +65,10 @@
     <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
   </h1>
   <div class="search-box">
-    <div class="autocomplete-box" id="autocompleteBox"></div>
-<input type="text" id="searchInput" placeholder="Search Mafios world..." oninput="showSuggestions()" />
-
-    <input type="text" id="searchInput" placeholder="Search Mafios world..." />
+    <input type="text" id="searchInput" placeholder="Search Mafios world..." oninput="showSuggestions()" />
     <button onclick="search()">Search</button>
-    <a href="dashboard.html">Go to Dashboard</a>
+    <div class="autocomplete-box" id="autocompleteBox"></div>
+    <a href="dashboard.html" style="display:block;margin-top:10px;color:#ff3366;">Go to Dashboard</a>
   </div>
 
   <div id="results"></div>
@@ -34,69 +84,61 @@
     );
 
     function search() {
-  const query = document.getElementById('searchInput').value.trim();
-  if(!query) return alert("Type something to search!");
-  window.location.href = "search.html?q=" + encodeURIComponent(query);
-}
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return alert("Type something to search!");
 
-
-      // Save history in localStorage
+      // Save history
       let history = JSON.parse(localStorage.getItem("mafios_history")) || [];
       history.unshift(query);
       localStorage.setItem("mafios_history", JSON.stringify(history.slice(0, 5)));
 
-      // Display results (demo)
+      // Show result (demo)
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = `<div class='result-item'>Result for: ${query}</div>` +
         history.map(h => `<div class='result-item'>History: ${h}</div>`).join('');
     }
 
-    supabaseClient.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        console.log("Guest Mode: User not logged in");
-      }
-   const suggestionsData = [
-  "Mafia World News",
-  "Mafia Chat",
-  "Mafia Resell Shop",
-  "Mafia Fashion",
-  "Mafia Queen Suits",
-  "Mafia Chat Voice Feature",
-  "Mafia Google Clone",
-  "Mafia AI Tools",
-  "Mafia Dark Web",
-  "Mafia Lifestyle Secrets"
-];
+    const suggestionsData = [
+      "Mafia World News",
+      "Mafia Chat",
+      "Mafia Resell Shop",
+      "Mafia Fashion",
+      "Mafia Queen Suits",
+      "Mafia Chat Voice Feature",
+      "Mafia Google Clone",
+      "Mafia AI Tools",
+      "Mafia Dark Web",
+      "Mafia Lifestyle Secrets"
+    ];
 
-function showSuggestions() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  const box = document.getElementById('autocompleteBox');
-  box.innerHTML = '';
-  if (!query) return;
-
-  const history = JSON.parse(localStorage.getItem("mafios_history")) || [];
-  const combined = [...new Set([...history, ...suggestionsData])];
-
-  const matched = combined.filter(item => item.toLowerCase().includes(query));
-  matched.forEach(item => {
-    const div = document.createElement('div');
-    div.classList.add('suggestion');
-    div.innerText = item;
-    div.onclick = () => {
-      document.getElementById('searchInput').value = item;
+    function showSuggestions() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const box = document.getElementById('autocompleteBox');
       box.innerHTML = '';
-      search();
-    };
-    box.appendChild(div);
-  });
-}
+      if (!query) return;
 
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('#searchInput')) {
-    document.getElementById('autocompleteBox').innerHTML = '';
-  }
-});
+      const history = JSON.parse(localStorage.getItem("mafios_history")) || [];
+      const combined = [...new Set([...history, ...suggestionsData])];
 
+      const matched = combined.filter(item => item.toLowerCase().includes(query));
+      matched.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('suggestion');
+        div.innerText = item;
+        div.onclick = () => {
+          document.getElementById('searchInput').value = item;
+          box.innerHTML = '';
+          search();
+        };
+        box.appendChild(div);
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#searchInput')) {
+        document.getElementById('autocompleteBox').innerHTML = '';
+      }
+    });
   </script>
 </body>
 </html>
