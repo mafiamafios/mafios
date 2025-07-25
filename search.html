@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mafios Search Results</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .search-results { max-width: 800px; width: 100%; margin-top: 20px; }
+    .card {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: transform 0.3s;
+    }
+    .card img {
+      width: 100px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .card:hover { transform: scale(1.02); }
+    .card-content a {
+      color: #ff3366;
+      font-size: 18px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .card-content p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
+  </h1>
+  <div class="search-box" style="flex-direction: row; gap:10px;">
+    <input type="text" id="searchInput" placeholder="Search again..." />
+    <button onclick="newSearch()">Search</button>
+  </div>
+  
+  <div class="search-results" id="searchResults"></div>
+
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    const query = getQueryParam('q');
+    document.getElementById('searchInput').value = query || "";
+
+    function renderResults(q) {
+      const resultsDiv = document.getElementById('searchResults');
+      if(!q) {
+        resultsDiv.innerHTML = "<p>No search term provided.</p>";
+        return;
+      }
+      // Demo data
+      const demoResults = [
+        { title: "Mafia World News", url: "#", desc: "Get latest mafia updates, power moves, and secret plans.", img: "https://source.unsplash.com/100x80/?news" },
+        { title: "Mafia Resell Shop", url: "https://mafiaresell.com", desc: "Premium resell items and mafia fashion collection.", img: "https://source.unsplash.com/100x80/?shop" },
+        { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/100x80/?chat" },
+      ];
+
+      resultsDiv.innerHTML = demoResults.map(item => `
+        <div class="card">
+          <img src="${item.img}" alt="img"/>
+          <div class="card-content">
+            <a href="${item.url}" target="_blank">${item.title}</a>
+            <p>${item.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function newSearch() {
+      const q = document.getElementById('searchInput').value.trim();
+      if(!q) return;
+      window.location.href = "search.html?q=" + encodeURIComponent(q);
+    }
+
+    renderResults(query);
+  </script>
+</body>
+</html>
