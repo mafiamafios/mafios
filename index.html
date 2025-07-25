@@ -1,12 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mafios</title>
-  <meta http-equiv="refresh" content="0; url=signup.html">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mafios Search</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <p>Redirecting to Signup...</p>
+  <div id="loader"></div>
+  <h1>MAFIOS</h1>
+  <div class="search-box">
+    <input type="text" placeholder="Search Mafios world..." />
+    <button onclick="search()">Search</button>
+    <a href="dashboard.html">Go to Dashboard</a>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      document.getElementById("loader").style.display = "none";
+    }, 3000);
+
+    function search() {
+      alert("Search system coming soon, Jan 😎");
+    }
+
+    const supabaseClient = supabase.createClient(
+      "https://gmexnhcawqfndbtsqauj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
+    );
+
+    supabaseClient.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
 </body>
 </html>
