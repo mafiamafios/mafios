@@ -12,14 +12,14 @@
     <input type="email" id="email" placeholder="Your Real Email" required>
     <input type="password" id="password" placeholder="Password" required>
     <button onclick="login()">Login</button>
-    <p>Don't have an account? <a href="signup.html" style="color:#ff3366;">Signup</a></p>
+    <p>Don't have an account? <a href="signup.html">Signup</a></p>
   </div>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://gmexnhcawqfndbtsqauj.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
+
     async function login() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
