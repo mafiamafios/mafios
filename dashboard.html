@@ -70,6 +70,33 @@
       color: #fff;
     }
 
+    /* Search Section */
+    .search-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      background: #0a0a0a;
+    }
+    .search-section input {
+      width: 70%;
+      max-width: 500px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    .search-section button {
+      padding: 10px 15px;
+      background: #ff3366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
     /* Content Section */
     .content {
       padding: 20px;
@@ -107,7 +134,7 @@
   <!-- HEADER -->
   <div class="dashboard-header">
     <div class="profile-section">
-      <img id="profilePic" class="profile-avatar" src="https://via.placeholder.com/40/ff3366/ffffff?text=M" alt="Profile" />
+      <img id="profilePic" class="profile-avatar" src="default-avatar.png" alt="Profile" />
       <span id="usernameDisplay">@mafios</span>
     </div>
     <div class="menu">
@@ -119,9 +146,15 @@
     </div>
   </div>
 
+  <!-- SEARCH -->
+  <div class="search-section">
+    <input type="text" id="searchInput" placeholder="Search Mafios world...">
+    <button onclick="search()">Search</button>
+  </div>
+
   <!-- CONTENT -->
   <div class="content">
-    <h2>Welcome to Mafia Dashboard</h2>
+    <h2>Trending Mafia Images</h2>
     <div class="image-grid" id="imageGrid">
       <!-- Images will load dynamically -->
     </div>
@@ -133,23 +166,16 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
     );
 
-    // Toggle dropdown menu
     function toggleMenu() {
       document.getElementById("menuDropdown").classList.toggle("show");
     }
+
     document.addEventListener("click", function(e) {
       if (!e.target.closest(".menu")) {
         document.getElementById("menuDropdown").classList.remove("show");
       }
     });
 
-    // Logout function
-    async function logout() {
-      await supabaseClient.auth.signOut();
-      window.location.href = "login.html";
-    }
-
-    // Load User Profile
     async function loadUserProfile() {
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) return window.location.href = "login.html";
@@ -162,23 +188,36 @@
 
       if (!error && data) {
         document.getElementById('usernameDisplay').innerText = data.mafios_id || user.email;
-        document.getElementById('profilePic').src = data.profile_pic || "https://via.placeholder.com/40/ff3366/ffffff?text=M";
+        document.getElementById('profilePic').src = data.profile_pic || "default-avatar.png";
       }
     }
 
-    // Load Random Images
-    function loadImageGrid() {
-      const images = [
-        "https://source.unsplash.com/random/300x300?mafia",
-        "https://source.unsplash.com/random/300x300?luxury",
-        "https://source.unsplash.com/random/300x300?city",
-        "https://source.unsplash.com/random/300x300?cars",
-        "https://source.unsplash.com/random/300x300?fashion",
-        "https://source.unsplash.com/random/300x300?money",
-        "https://source.unsplash.com/random/300x300?business"
-      ];
+    function search() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return alert("Type something to search!");
+      window.location.href = "search.html?q=" + encodeURIComponent(query);
+    }
+
+    async function loadImageGrid() {
       const grid = document.getElementById('imageGrid');
-      grid.innerHTML = images.map(img => `<img src="${img}" alt="Image"/>`).join('');
+      const demoImages = [
+        "https://source.unsplash.com/300x200/?mafia",
+        "https://source.unsplash.com/300x200/?gangster",
+        "https://source.unsplash.com/300x200/?luxury",
+        "https://source.unsplash.com/300x200/?suit",
+        "https://source.unsplash.com/300x200/?car",
+        "https://source.unsplash.com/300x200/?money",
+        "https://source.unsplash.com/300x200/?weapons",
+        "https://source.unsplash.com/300x200/?fashion",
+        "https://source.unsplash.com/300x200/?dark",
+        "https://source.unsplash.com/300x200/?city",
+      ];
+      grid.innerHTML = demoImages.map(img => `<img src="${img}" alt="mafia"/>`).join('');
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = "login.html";
     }
 
     loadUserProfile();
