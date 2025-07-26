@@ -6,35 +6,6 @@
   <title>Signup - Mafios</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    form {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    input, button {
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      background: #ff0033;
-      color: #fff;
-      cursor: pointer;
-    }
-  </style>
 </head>
 <body>
   <h1>Create Mafia ID</h1>
@@ -44,7 +15,7 @@
     <button type="submit">Signup</button>
     <a href="login.html">Already have an account? Login</a>
   </form>
-
+  
   <script>
     const supabaseClient = supabase.createClient(
       "https://gmexnhcawqfndbtsqauj.supabase.co",
@@ -57,13 +28,18 @@
       const password = document.getElementById("signupPassword").value;
 
       const { data, error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) {
-        alert(error.message);
-      } else {
-        const user = data.user;
-        const randomName = email.split('@')[0] + "_" + Math.floor(Math.random() * 1000);
-        await supabaseClient.from('profiles').insert([{ id: user.id, mafios_id: randomName + "@mafios" }]);
-        window.location.href = "welcome.html";
+      if (error) return alert(error.message);
+
+      const user = data.user;
+      if (user) {
+        // Add default profile entry
+        const defaultUsername = email.split("@")[0] + "@mafios";
+        await supabaseClient.from('profiles').insert([
+          { id: user.id, mafios_id: defaultUsername, profile_pic: null }
+        ]);
+
+        alert("Signup successful! Redirecting to profile setup...");
+        window.location.href = "editprofile.html";
       }
     });
   </script>
