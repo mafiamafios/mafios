@@ -83,14 +83,16 @@
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://gmexnhcawqfndbtsqauj.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = supabase.createClient(
+      "https://gmexnhcawqfndbtsqauj.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
+    );
+
     let currentUser = null;
 
     async function getCurrentUser() {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
+      const { data, error } = await supabaseClient.auth.getUser();
+      if (data?.user) {
         currentUser = data.user;
       } else {
         window.location.href = "login.html";
@@ -100,21 +102,29 @@
     async function updateProfile() {
       const username = document.getElementById('username').value.trim();
       let updateData = {};
+
       if (username) {
-        updateData.mafios_id = username + "@mafios";
+        updateData.mafios_id = username.startsWith("@") ? username : "@" + username;
       }
+
       const file = document.getElementById('uploadPic').files[0];
       if (file) {
-        const fileName = currentUser.id + "-" + file.name;
-        const { data, error } = await supabase.storage.from('avatars').upload(fileName, file, { upsert: true });
-        if (!error) {
-          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        const fileName = `${currentUser.id}-${Date.now()}-${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabaseClient
+          .storage.from('avatars')
+          .upload(fileName, file, { upsert: true });
+        if (!uploadError) {
+          const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
           updateData.profile_pic = urlData.publicUrl;
         }
       }
+
       if (Object.keys(updateData).length > 0) {
-        await supabase.from('profiles').update(updateData).eq('id', currentUser.id);
-        alert("Profile updated!");
+        await supabaseClient.from('profiles').update(updateData).eq('id', currentUser.id);
+        alert("Profile updated successfully!");
+        window.location.href = "dashboard.html";
+      } else {
+        alert("No changes to update.");
       }
     }
 
