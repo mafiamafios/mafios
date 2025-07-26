@@ -2,148 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mafia Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     body {
-      background-color: #121212;
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 20px;
-      position: relative;
-      min-height: 100vh;
+      background: #0a0a0a;
+      color: white;
+      font-family: 'Poppins', sans-serif;
     }
-    h1 {
-      text-align: center;
-      margin-top: 50px;
-      font-size: 3rem;
-      letter-spacing: 0.2em;
-      user-select: none;
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: #111;
+      border-bottom: 2px solid #ff3366;
+    }
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #ff3366;
+      object-fit: cover;
     }
     .menu {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      z-index: 100;
+      position: relative;
     }
     .menu-btn {
-      background: transparent;
+      background: none;
       border: none;
-      color: #ff0033;
-      font-size: 32px;
+      font-size: 24px;
+      color: white;
       cursor: pointer;
-      user-select: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
     }
-    .menu-btn:hover {
-      background-color: #ff003344;
-    }
-    .dropdown {
+    .menu-dropdown {
       display: none;
       position: absolute;
+      top: 35px;
       right: 0;
-      top: 40px;
-      background-color: #1e1e1e;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #ff0033aa;
-      min-width: 180px;
+      background: #1a1a1a;
+      border-radius: 5px;
       overflow: hidden;
-      user-select: none;
+      min-width: 160px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      z-index: 10;
     }
-    .dropdown a {
+    .menu-dropdown.show { display: block; }
+    .menu-dropdown a {
       display: block;
-      padding: 12px 15px;
-      color: #fff;
+      padding: 10px;
+      color: #ccc;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      transition: background-color 0.2s ease;
+      transition: background 0.2s;
     }
-    .dropdown a:hover {
-      background-color: #ff0033;
+    .menu-dropdown a:hover {
+      background: #333;
       color: #fff;
     }
-    /* Placeholder grid container */
+
+    /* Content Section */
     .content {
-      margin-top: 80px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
-      gap: 20px;
-    }
-    .card {
-      background: #222;
-      border-radius: 12px;
-      padding: 15px;
-      color: #fff;
+      padding: 20px;
       text-align: center;
-      font-weight: 700;
-      box-shadow: 0 0 8px #ff0033aa;
-      transition: transform 0.3s ease;
-      cursor: pointer;
-      user-select: none;
     }
-    .card:hover {
+    .content h2 {
+      color: #ff3366;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    /* Image Grid */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
+    .image-grid img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      border: 2px solid #1a1a1a;
+    }
+    .image-grid img:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 15px #ff0033ff;
+      border-color: #ff3366;
+      box-shadow: 0 0 10px #ff3366;
     }
   </style>
 </head>
 <body>
-
-  <div class="menu">
-    <button class="menu-btn" aria-label="Menu" onclick="toggleMenu()">⋮</button>
-    <div class="dropdown" id="menuDropdown">
-      <a href="edit-profile.html">Edit Profile</a>
-      <a href="#" onclick="alert('Change Username feature coming soon!')">Change Username</a>
-      <a href="#" onclick="alert('Change Email feature coming soon!')">Change Email</a>
-      <a href="#" onclick="logout()">Logout</a>
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <div class="profile-section">
+      <img id="profilePic" class="profile-avatar" src="https://via.placeholder.com/40/ff3366/ffffff?text=M" alt="Profile" />
+      <span id="usernameDisplay">@mafios</span>
+    </div>
+    <div class="menu">
+      <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+      <div class="menu-dropdown" id="menuDropdown">
+        <a href="editprofile.html">Edit Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
     </div>
   </div>
 
-  <h1>Welcome to Mafia Dashboard</h1>
-
-  <div class="content" id="contentGrid">
-    <!-- Placeholder cards -->
-    <div class="card">Mafia News</div>
-    <div class="card">Mafia Resell Shop</div>
-    <div class="card">Mafia Chat</div>
-    <div class="card">Mafia AI Tools</div>
-    <div class="card">Mafia Lifestyle</div>
-    <div class="card">Mafia Dark Web</div>
+  <!-- CONTENT -->
+  <div class="content">
+    <h2>Welcome to Mafia Dashboard</h2>
+    <div class="image-grid" id="imageGrid">
+      <!-- Images will load dynamically -->
+    </div>
   </div>
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const supabaseClient = supabase.createClient(
       "https://gmexnhcawqfndbtsqauj.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZXhuaGNhd3FmbmRidHNxYXVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDczODAsImV4cCI6MjA2OTAyMzM4MH0.3Qsx0-pLF8gGlXE5Bnf_mFGlcNuUOVYhWZdDsupD3TM"
     );
 
+    // Toggle dropdown menu
     function toggleMenu() {
-      const menu = document.getElementById('menuDropdown');
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      document.getElementById("menuDropdown").classList.toggle("show");
     }
+    document.addEventListener("click", function(e) {
+      if (!e.target.closest(".menu")) {
+        document.getElementById("menuDropdown").classList.remove("show");
+      }
+    });
 
+    // Logout function
     async function logout() {
       await supabaseClient.auth.signOut();
       window.location.href = "login.html";
     }
 
-    // Close dropdown if clicked outside
-    document.addEventListener('click', (e) => {
-      const menu = document.getElementById('menuDropdown');
-      const btn = document.querySelector('.menu-btn');
-      if (!btn.contains(e.target) && !menu.contains(e.target)) {
-        menu.style.display = 'none';
-      }
-    });
+    // Load User Profile
+    async function loadUserProfile() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) return window.location.href = "login.html";
 
+      const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('mafios_id, profile_pic')
+        .eq('id', user.id)
+        .single();
+
+      if (!error && data) {
+        document.getElementById('usernameDisplay').innerText = data.mafios_id || user.email;
+        document.getElementById('profilePic').src = data.profile_pic || "https://via.placeholder.com/40/ff3366/ffffff?text=M";
+      }
+    }
+
+    // Load Random Images
+    function loadImageGrid() {
+      const images = [
+        "https://source.unsplash.com/random/300x300?mafia",
+        "https://source.unsplash.com/random/300x300?luxury",
+        "https://source.unsplash.com/random/300x300?city",
+        "https://source.unsplash.com/random/300x300?cars",
+        "https://source.unsplash.com/random/300x300?fashion",
+        "https://source.unsplash.com/random/300x300?money",
+        "https://source.unsplash.com/random/300x300?business"
+      ];
+      const grid = document.getElementById('imageGrid');
+      grid.innerHTML = images.map(img => `<img src="${img}" alt="Image"/>`).join('');
+    }
+
+    loadUserProfile();
+    loadImageGrid();
   </script>
 </body>
 </html>
