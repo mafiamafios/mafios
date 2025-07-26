@@ -7,84 +7,110 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      background: linear-gradient(135deg, #000, #111);
-      color: #fff;
-      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
       text-align: center;
-      padding: 20px;
+      margin: 20px 0;
+      color: #ff3366;
+      font-size: 36px;
+      letter-spacing: 8px;
     }
-    h1 span {
-      font-size: 45px;
-      color: #ff0033;
-      text-shadow: 0 0 10px #ff3366, 0 0 20px #ff0033;
-      display: inline-block;
-      margin: 0 2px;
-    }
-    .search-box {
+    .search-container {
       display: flex;
       justify-content: center;
-      margin: 20px 0;
+      align-items: center;
       gap: 10px;
-    }
-    .search-box input {
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      width: 250px;
-      background: #222;
-      color: #fff;
-    }
-    .search-box button {
       padding: 10px 20px;
-      border: none;
+    }
+    #searchInput {
+      width: 60%;
+      max-width: 500px;
+      padding: 10px 15px;
       border-radius: 5px;
-      background: #ff0033;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      border: none;
+      font-size: 16px;
     }
-    .search-box button:hover {
+    button, .icon-btn {
       background: #ff3366;
-      box-shadow: 0 0 10px #ff3366;
-    }
-    .search-results {
-      max-width: 800px;
-      margin: 20px auto;
-      text-align: left;
-    }
-    .card {
-      background: #1e1e1e;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 10px 15px;
+      border-radius: 5px;
       display: flex;
       align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+    button:hover, .icon-btn:hover {
+      background: #ff6688;
+    }
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+    }
+    .icon-btn svg {
+      fill: white;
+      width: 20px;
+      height: 20px;
+    }
+    .results-grid {
+      max-width: 900px;
+      margin: 20px auto 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 15px;
-      transition: transform 0.3s, box-shadow 0.3s;
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      padding: 0 20px;
     }
-    .card:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 15px #ff0033;
+    .result-card {
+      background: #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
-    .card img {
-      width: 100px;
-      height: 80px;
+    .result-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ff3366;
+    }
+    .result-card img {
+      width: 100%;
+      height: 140px;
       object-fit: cover;
-      border-radius: 8px;
     }
-    .card-content a {
+    .result-info {
+      padding: 10px;
+      flex-grow: 1;
+    }
+    .result-title {
+      font-weight: 700;
       color: #ff3366;
-      font-size: 18px;
+      margin-bottom: 6px;
+      font-size: 16px;
       text-decoration: none;
-      font-weight: bold;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .card-content p {
-      margin: 5px 0 0;
-      font-size: 14px;
+    .result-desc {
+      font-size: 13px;
       color: #ccc;
+      height: 38px;
+      overflow: hidden;
+      line-height: 1.2em;
+    }
+    #fileInput {
+      display: none;
     }
   </style>
 </head>
@@ -92,52 +118,146 @@
   <h1>
     <span>M</span><span>A</span><span>F</span><span>I</span><span>O</span><span>S</span>
   </h1>
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search again..." />
-    <button onclick="newSearch()">Search</button>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search Mafios world..." />
+    <button id="searchBtn">Search</button>
+    <button class="icon-btn" id="micBtn" title="Voice Search" aria-label="Voice Search">
+      <!-- Microphone SVG icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11v1a7 7 0 0 1-14 0v-1"/></svg>
+    </button>
+    <button class="icon-btn" id="cameraBtn" title="Image Search" aria-label="Image Search">
+      <!-- Camera SVG icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 5h-3.586l-1.707-1.707a1 1 0 0 0-.707-.293H9.999a1 1 0 0 0-.707.293L7.586 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-8 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
+    </button>
+    <input type="file" id="fileInput" accept="image/*" />
   </div>
-  
-  <div class="search-results" id="searchResults"></div>
+
+  <div class="results-grid" id="resultsGrid"></div>
 
   <script>
+    // Parse query from URL param
     function getQueryParam(param) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(param);
     }
 
-    const query = getQueryParam('q');
-    document.getElementById('searchInput').value = query || "";
+    const searchInput = document.getElementById('searchInput');
+    const resultsGrid = document.getElementById('resultsGrid');
+    const searchBtn = document.getElementById('searchBtn');
+    const micBtn = document.getElementById('micBtn');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const fileInput = document.getElementById('fileInput');
 
-    function renderResults(q) {
-      const resultsDiv = document.getElementById('searchResults');
-      if(!q) {
-        resultsDiv.innerHTML = "<p>No search term provided.</p>";
+    // Fill search input from URL param if exists
+    const query = getQueryParam('q') || "";
+    searchInput.value = query;
+
+    // Demo static data for results (replace with your real API/fetch)
+    const demoResults = [
+      { title: "Mafia World News", url: "#", desc: "Get latest mafia updates, power moves, and secret plans.", img: "https://source.unsplash.com/300x200/?news,mafia" },
+      { title: "Mafia Resell Shop", url: "https://mafiaresell.com", desc: "Premium resell items and mafia fashion collection.", img: "https://source.unsplash.com/300x200/?shop,mafia" },
+      { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/300x200/?chat,mafia" },
+      { title: "Mafia Queen Suits", url: "#", desc: "Exclusive mafia style suits for the bosses.", img: "https://source.unsplash.com/300x200/?suit,mafia" },
+      { title: "Mafia AI Tools", url: "#", desc: "AI-powered tools for mafia business growth.", img: "https://source.unsplash.com/300x200/?technology,mafia" },
+      { title: "Mafia Dark Web", url: "#", desc: "Secrets of the dark mafia web.", img: "https://source.unsplash.com/300x200/?dark,mafia" }
+    ];
+
+    function renderResults(results) {
+      if (!results || results.length === 0) {
+        resultsGrid.innerHTML = "<p style='text-align:center;color:#ff3366;'>No results found.</p>";
         return;
       }
-      const demoResults = [
-        { title: "Mafia World News", url: "#", desc: "Get latest mafia updates, power moves, and secret plans.", img: "https://source.unsplash.com/100x80/?news" },
-        { title: "Mafia Resell Shop", url: "https://mafiaresell.com", desc: "Premium resell items and mafia fashion collection.", img: "https://source.unsplash.com/100x80/?shop" },
-        { title: "Mafia Chat App", url: "#", desc: "Join the most secretive mafia chat rooms.", img: "https://source.unsplash.com/100x80/?chat" }
-      ];
-
-      resultsDiv.innerHTML = demoResults.map(item => `
-        <div class="card">
-          <img src="${item.img}" alt="img"/>
-          <div class="card-content">
-            <a href="${item.url}" target="_blank">${item.title}</a>
-            <p>${item.desc}</p>
+      resultsGrid.innerHTML = results.map(item => `
+        <div class="result-card" onclick="window.open('${item.url}', '_blank')">
+          <img src="${item.img}" alt="${item.title}" />
+          <div class="result-info">
+            <a href="${item.url}" class="result-title" target="_blank" rel="noopener">${item.title}</a>
+            <p class="result-desc">${item.desc}</p>
           </div>
         </div>
       `).join('');
     }
 
-    function newSearch() {
-      const q = document.getElementById('searchInput').value.trim();
-      if(!q) return;
-      window.location.href = "search.html?q=" + encodeURIComponent(q);
+    function doSearch(q) {
+      if (!q.trim()) {
+        alert("Please type something to search!");
+        return;
+      }
+      // In real app, fetch from API with q param
+      // For demo, filter demoResults by title/desc
+      const lowerQ = q.toLowerCase();
+      const filtered = demoResults.filter(item => item.title.toLowerCase().includes(lowerQ) || item.desc.toLowerCase().includes(lowerQ));
+      renderResults(filtered);
+      history.pushState(null, '', `search.html?q=${encodeURIComponent(q)}`);
     }
 
-    renderResults(query);
+    searchBtn.addEventListener('click', () => {
+      doSearch(searchInput.value);
+    });
+
+    // Search on Enter key
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        doSearch(searchInput.value);
+      }
+    });
+
+    // Voice search setup
+    micBtn.addEventListener('click', () => {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Voice search not supported in this browser.');
+        return;
+      }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.start();
+
+      micBtn.style.background = "#ff6688";
+
+      recognition.onresult = (event) => {
+        const speechResult = event.results[0][0].transcript;
+        searchInput.value = speechResult;
+        doSearch(speechResult);
+        micBtn.style.background = "#ff3366";
+      };
+
+      recognition.onerror = (event) => {
+        alert('Voice recognition error: ' + event.error);
+        micBtn.style.background = "#ff3366";
+      };
+
+      recognition.onend = () => {
+        micBtn.style.background = "#ff3366";
+      };
+    });
+
+    // Image search setup
+    cameraBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      // For demo: just show filename as search
+      // Real app: integrate image recognition / upload & process
+      const fakeSearchTerm = file.name.split('.')[0].replace(/[_-]/g, ' ');
+      searchInput.value = fakeSearchTerm;
+      doSearch(fakeSearchTerm);
+    });
+
+    // On page load: do search if query param exists
+    if (query.trim()) {
+      doSearch(query);
+    } else {
+      renderResults(demoResults);
+    }
   </script>
 </body>
 </html>
